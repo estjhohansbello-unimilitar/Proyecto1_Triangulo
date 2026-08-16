@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <cmath>
 // Guarda las instrucciones que procesan cada vértice de un objeto 3D
 //(como cambiar posiciones o calcular coordenadas).
 const char* vertexShaderSource = "#version 330 core\n"
@@ -36,12 +37,12 @@ int main ()
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// se añade los vertices para un triangulo equilatero
-	Glfloat vertices [] = 
+	GLfloat vertices[] =
 	{
-	-0.5f, -0.5f * float(sqrt(3))/3, 0.0f
-	 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f
-	 0.0f, 0.5f * float(sqrt(3))*2 / 3, 0.0f
-	}
+		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
+		 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
+		 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f
+	};
 
 	// Crea una ventana de 800x600 píxeles.
 	// "LearnOpenGL" será el título de la ventana.
@@ -197,8 +198,9 @@ int main ()
 
 	while (!glfwWindowShouldClose(window)) {
 
-		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		
 
 		//activamos el shaderProgram para que OpenGL lo use 
 		// en el siguiente renderizado
