@@ -155,13 +155,36 @@ int main ()
 	glDeleteShader(fragmentShader);
 
 
+	// El siguiente bloque crea y configura un VAO (Vertex Array Object) y un VBO (Vertex Buffer Object).
+// El VBO almacena los datos de los vértices en la memoria de la GPU, mientras que el VAO
+// guarda la configuración necesaria para interpretar esos datos. También se establece que
+// cada vértice está compuesto por 3 valores de tipo float (coordenadas X, Y, Z) y se habilita
+// el atributo de vértice en la posición 0. Finalmente, se desvinculan el VBO y el VAO para
+// evitar modificaciones accidentales.
 
+	GLuint VAO,VBO;
+	
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	// Limpia el framebuffer utilizando el color definido
 	// anteriormente con glClearColor().
 	//
 	// GL_COLOR_BUFFER_BIT indica que queremos limpiar
 	// el buffer de color.
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Intercambia los buffers.
@@ -173,9 +196,17 @@ int main ()
 	glfwSwapBuffers(window);	
 
 	while (!glfwWindowShouldClose(window)) {
+
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glfwPollEvents();
 		
 	}
+
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteProgram(shaderProgram);
+
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
