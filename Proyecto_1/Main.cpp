@@ -199,6 +199,18 @@ int main ()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+		//activamos el shaderProgram para que OpenGL lo use 
+		// en el siguiente renderizado
+		glUseProgram(shaderProgram);
+
+		// Vincula el VAO que contiene la configuración de los vértices.
+		glBindVertexArray(VAO);
+
+		// Dibuja el triángulo utilizando los vértices almacenados en el VBO.
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glfwSwapBuffers(window);
+
 		glfwPollEvents();
 		
 	}
