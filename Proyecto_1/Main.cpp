@@ -75,8 +75,86 @@ int main ()
 // 800  -> ancho
 // 600  -> alto
 	glViewport(0, 0, 800, 600);
+	// ============================================================
+// VERTEX SHADER
+// ============================================================
 
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+// Crea un objeto de tipo Vertex Shader.
+// GL_VERTEX_SHADER indica que este shader se encargará
+// de procesar los vértices.
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+
+	// Le proporciona el código fuente al Vertex Shader.
+	//
+	// vertexShader       -> shader al que le damos el código.
+	// 1                  -> cantidad de strings que estamos pasando.
+	// &vertexShaderSource -> dirección donde está nuestro código fuente.
+	// NULL               -> no estamos especificando una longitud manual.
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+
+
+	// Compila el código fuente del Vertex Shader.
+	// Convierte el código GLSL en una forma que OpenGL pueda ejecutar.
+	glCompileShader(vertexShader);
+
+
+	// ============================================================
+	// FRAGMENT SHADER
+	// ============================================================
+
+	// Crea un objeto de tipo Fragment Shader.
+	// GL_FRAGMENT_SHADER indica que este shader se encargará
+	// de determinar el color de los fragmentos/píxeles.
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+
+	// Le proporciona el código fuente al Fragment Shader.
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+
+
+	// Compila el código fuente del Fragment Shader.
+	glCompileShader(fragmentShader);
+
+
+	// ============================================================
+	// SHADER PROGRAM
+	// ============================================================
+
+	// Crea un Shader Program.
+	// Este será el programa que contiene y conecta nuestros
+	// Vertex Shader y Fragment Shader.
+	GLuint shaderProgram = glCreateProgram();
+
+
+	// Adjunta el Vertex Shader al Shader Program.
+	glAttachShader(shaderProgram, vertexShader);
+
+
+	// Adjunta el Fragment Shader al Shader Program.
+	glAttachShader(shaderProgram, fragmentShader);
+
+
+	// Enlaza (link) los shaders entre sí.
+	//
+	// OpenGL comprueba que el Vertex Shader y el Fragment Shader
+	// puedan trabajar juntos y crea el programa final.
+	glLinkProgram(shaderProgram);
+
+
+	// ============================================================
+	// LIMPIEZA
+	// ============================================================
+
+	// Una vez que los shaders fueron enlazados al programa,
+	// ya no necesitamos mantener estos objetos por separado.
+	//
+	// El Shader Program conserva el código necesario,
+	// por lo que podemos eliminar los objetos originales.
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+
 
 
 	// Limpia el framebuffer utilizando el color definido
