@@ -1,231 +1,120 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <cmath>
-// Guarda las instrucciones que procesan cada vértice de un objeto 3D
-//(como cambiar posiciones o calcular coordenadas).
+#include<iostream>
+#include<glad/glad.h>
+#include<GLFW/glfw3.h>
+
+#include"shaderClass.h"
+#include"VAO.h"
+#include"VBO.h"
+#include"EBO.h"
 
 
-int main ()
+
+// Vertices coordinates
+GLfloat vertices[] =
 {
+	-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower left corner
+	0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower right corner
+	0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper corner
+	-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner left
+	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner right
+	0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // Inner down
+};
+
+// Indices for vertices order
+GLuint indices[] =
+{
+	0, 3, 5, // Lower left triangle
+	3, 2, 4, // Lower right triangle
+	5, 4, 1 // Upper triangle
+};
+
+
+
+int main()
+{
+	// Initialize GLFW
 	glfwInit();
-	// Your code here
 
-// Le indicamos a GLFW qué versión de OpenGL queremos utilizar.
-// En este caso: OpenGL 3.3.
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+	// Tell GLFW what version of OpenGL we are using 
+	// In this case we are using OpenGL 3.3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	// Tell GLFW we are using the CORE profile
+	// So that means we only have the modern functions
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
-	// Le indicamos que queremos utilizar el perfil "Core" de OpenGL.
-	// Core Profile utiliza las funciones modernas de OpenGL
-	// y elimina muchas funciones antiguas.
-	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// se añade los vertices para un triangulo equilatero
-	GLfloat vertices[] =
+	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
+	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
+	// Error check if the window fails to create
+	if (window == NULL)
 	{
-		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, //lower left corner
-		 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // lower right corner
-		 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // upper corner
-		- 0.5f/2, 0.5f* float(sqrt(3)) / 6, 0.0f, // inner left	
-		0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // inner right 
-		0.0f,-0.5f * float(sqrt(3)) / 3,0.0f, // Inner down
-	};
-	GLuint indices [] = 
-	{
-		0,3,5, // lower left triangle 
-		3,2,4,// lower right triangle 
-		5,4,1 // upper Triangle
-	};
-
-	// Crea una ventana de 800x600 píxeles.
-
-	// "LearnOpenGL" será el título de la ventana.
-	//
-	// Los dos últimos NULL indican que no estamos usando:
-	// - un monitor específico (pantalla completa)
-	// - una ventana existente de la cual compartir recursos
-
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	// Hace que el contexto de OpenGL de nuestra ventana
-// sea el contexto actual.
-//
-// En otras palabras: le decimos a OpenGL
-// "vamos a trabajar con esta ventana".
-
+	// Introduce the window into the current context
 	glfwMakeContextCurrent(window);
 
-	// GLAD carga las funciones de OpenGL que necesitamos.
-	// Esto es necesario porque muchas funciones de OpenGL
-	// no están disponibles directamente en Windows.
+	//Load GLAD so it configures OpenGL
 	gladLoadGL();
-
-	// Define el área de la ventana donde OpenGL va a dibujar.
-//
-// 0, 0 -> posición inicial (esquina inferior izquierda)
-// 800  -> ancho
-// 600  -> alto
-	glViewport(0, 0, 800, 600);
-	// ============================================================
-// VERTEX SHADER
-// ============================================================
-
-// Crea un objeto de tipo Vertex Shader.
-// GL_VERTEX_SHADER indica que este shader se encargará
-// de procesar los vértices.
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	// Specify the viewport of OpenGL in the Window
+	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
+	glViewport(0, 0, 800, 800);
 
 
-	// Le proporciona el código fuente al Vertex Shader.
-	//
-	// vertexShader       -> shader al que le damos el código.
-	// 1                  -> cantidad de strings que estamos pasando.
-	// &vertexShaderSource -> dirección donde está nuestro código fuente.
-	// NULL               -> no estamos especificando una longitud manual.
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+
+	// Generates Shader object using shaders defualt.vert and default.frag
+	Shader shaderProgram("default.vert", "default.frag");
 
 
-	// Compila el código fuente del Vertex Shader.
-	// Convierte el código GLSL en una forma que OpenGL pueda ejecutar.
-	glCompileShader(vertexShader);
+
+	// Generates Vertex Array Object and binds it
+	VAO VAO1;
+	VAO1.Bind();
+
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO1(vertices, sizeof(vertices));
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO1(indices, sizeof(indices));
+
+	// Links VBO to VAO
+	VAO1.LinkVBO(VBO1, 0);
+	// Unbind all to prevent accidentally modifying them
+	VAO1.Unbind();
+	VBO1.Unbind();
+	EBO1.Unbind();
 
 
-	// ============================================================
-	// FRAGMENT SHADER
-	// ============================================================
 
-	// Crea un objeto de tipo Fragment Shader.
-	// GL_FRAGMENT_SHADER indica que este shader se encargará
-	// de determinar el color de los fragmentos/píxeles.
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-
-	// Le proporciona el código fuente al Fragment Shader.
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-
-
-	// Compila el código fuente del Fragment Shader.
-	glCompileShader(fragmentShader);
-
-
-	// ============================================================
-	// SHADER PROGRAM
-	// ============================================================
-
-	// Crea un Shader Program.
-	// Este será el programa que contiene y conecta nuestros
-	// Vertex Shader y Fragment Shader.
-	GLuint shaderProgram = glCreateProgram();
-
-
-	// Adjunta el Vertex Shader al Shader Program.
-	glAttachShader(shaderProgram, vertexShader);
-
-
-	// Adjunta el Fragment Shader al Shader Program.
-	glAttachShader(shaderProgram, fragmentShader);
-
-
-	// Enlaza (link) los shaders entre sí.
-	//
-	// OpenGL comprueba que el Vertex Shader y el Fragment Shader
-	// puedan trabajar juntos y crea el programa final.
-	glLinkProgram(shaderProgram);
-
-
-	// ============================================================
-	// LIMPIEZA
-	// ============================================================
-
-	// Una vez que los shaders fueron enlazados al programa,
-	// ya no necesitamos mantener estos objetos por separado.
-	//
-	// El Shader Program conserva el código necesario,
-	// por lo que podemos eliminar los objetos originales.
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-
-	// El siguiente bloque crea y configura un VAO (Vertex Array Object) y un VBO (Vertex Buffer Object).
-// El VBO almacena los datos de los vértices en la memoria de la GPU, mientras que el VAO
-// guarda la configuración necesaria para interpretar esos datos. También se establece que
-// cada vértice está compuesto por 3 valores de tipo float (coordenadas X, Y, Z) y se habilita
-// el atributo de vértice en la posición 0. Finalmente, se desvinculan el VBO y el VAO para
-// evitar modificaciones accidentales.
-
-	GLuint VAO, VBO, EBO;
-	
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	// Limpia el framebuffer utilizando el color definido
-	// anteriormente con glClearColor().
-	//
-	// GL_COLOR_BUFFER_BIT indica que queremos limpiar
-	// el buffer de color.
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// Intercambia los buffers.
-//
-// OpenGL normalmente utiliza un buffer que se está mostrando
-// y otro en el que se está dibujando.
-//
-// Esta función muestra en pantalla lo que acabamos de dibujar.
-	glfwSwapBuffers(window);	
-
-	while (!glfwWindowShouldClose(window)) {
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	// Main while loop
+	while (!glfwWindowShouldClose(window))
+	{
+		// Specify the color of the background
+		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT);
-		
-
-		//activamos el shaderProgram para que OpenGL lo use 
-		// en el siguiente renderizado
-		glUseProgram(shaderProgram);
-
-		// Vincula el VAO que contiene la configuración de los vértices.
-		glBindVertexArray(VAO);
-
-		// Dibuja el triángulo utilizando los vértices almacenados en el VBO.
+		// Tell OpenGL which Shader Program we want to use
+		shaderProgram.Activate();
+		// Bind the VAO so OpenGL knows to use it
+		VAO1.Bind();
+		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
-
+		// Take care of all GLFW events
 		glfwPollEvents();
-		
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-	glDeleteProgram(shaderProgram);
 
+
+	// Delete all the objects we've created
+	VAO1.Delete();
+	VBO1.Delete();
+	EBO1.Delete();
+	shaderProgram.Delete();
+	// Delete window before ending the program
 	glfwDestroyWindow(window);
-
+	// Terminate GLFW before ending the program
 	glfwTerminate();
 	return 0;
 }
