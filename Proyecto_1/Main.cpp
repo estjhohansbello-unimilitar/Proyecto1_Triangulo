@@ -10,6 +10,12 @@
 
 
 // Vertices coordinates
+// Vertices coordinates - GATO hecho de triangulos (tipo tangram)
+// Nota: como el shader multiplica por "scale" (0.5f), estas coordenadas
+// se ven mas grandes en el codigo de lo que realmente ocupan en pantalla.
+
+
+/*
 GLfloat vertices[] =
 { //               COORDINATES                  /     COLORS           //
 	-0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
@@ -20,14 +26,56 @@ GLfloat vertices[] =
 	 0.0f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
 };
 
+
+*/
+
+
+GLfloat vertices[] =
+{ //          COORDINATES               /   COLORS (negro)   //
+
+	// --- Oreja izquierda ---
+-0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 0.0f,
+-0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.00f,  0.55f, 0.0f,   0.0f, 0.0f, 0.0f,
+
+// --- Oreja derecha ---
+0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.00f,  0.55f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f,
+
+ // --- Cabeza (triangulo ancho arriba, angosto abajo) ---
+-0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 0.0f,
+// --- Cuerpo, mitad izquierda ---
+0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 0.0f,
+-0.85f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+
+// --- Cuerpo, mitad derecha ---
+0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.85f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+
+ // --- Cola, triangulo 1 ---
+0.20f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+1.30f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+1.60f, -0.55f, 0.0f,   0.0f, 0.0f, 0.0f,
+
+ // --- Cola, triangulo 2 ---
+0.20f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f,
+1.60f, -0.55f, 0.0f,   0.0f, 0.0f, 0.0f,
+0.50f, -0.55f, 0.0f,   0.0f, 0.0f, 0.0f,
+};
+
 // Indices for vertices order
-GLuint indices[] =
+/*GLuint indices[] =
 {
 	0, 3, 5, // Lower left triangle
 	3, 2, 4, // Lower right triangle
 	5, 4, 1 // Upper triangle
 };
-
+*/
 
 
 int main()
@@ -62,7 +110,7 @@ int main()
 	glViewport(0, 0, 800, 800);
 
 
-
+	
 	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
@@ -75,7 +123,8 @@ int main()
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO VBO1(vertices, sizeof(vertices));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	
+	//EBO EBO1(indices, sizeof(indices));
 
 	// Links VBO to VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
@@ -83,7 +132,8 @@ int main()
 	// Unbind all to prevent accidentally modifying them
 	VAO1.Unbind();
 	VBO1.Unbind();
-	EBO1.Unbind();
+	
+	//EBO1.Unbind();
 
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
@@ -91,16 +141,23 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		
+		glClearColor(0.2f, 0.6f, 0.3f, 1.0f); // verde
+
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-		glUniform1f(uniID, 0.5f);
+		
+		//glUniform1f(uniID, 0.5f);
+		
+		glUniform1f(uniID, -0.7f);
+
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 21); // 7 triangulos x 3 vertices
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
@@ -112,7 +169,9 @@ int main()
 	// Delete all the objects we've created
 	VAO1.Delete();
 	VBO1.Delete();
-	EBO1.Delete();
+	
+	//EBO1.Delete();
+	
 	shaderProgram.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
