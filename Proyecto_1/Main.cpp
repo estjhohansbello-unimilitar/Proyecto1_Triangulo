@@ -87,105 +87,104 @@ GLfloat vertices[] =
 };
 */
 
-
 int main()
 {
-	// Initialize GLFW
+	// Inicializar GLFW
 	glfwInit();
 
-	// Tell GLFW what version of OpenGL we are using 
-	// In this case we are using OpenGL 3.3
+	// Indicarle a GLFW qué versión de OpenGL estamos utilizando
+	// En este caso estamos utilizando OpenGL 3.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Tell GLFW we are using the CORE profile
-	// So that means we only have the modern functions
+	// Indicarle a GLFW que estamos utilizando el perfil CORE
+	// Esto significa que solamente utilizaremos las funciones modernas
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
+	// Crear un objeto GLFWwindow de 800 por 800 píxeles, con el nombre "Proyecto1_Triangulo"
 	GLFWwindow* window = glfwCreateWindow(800, 800, "Proyecto1_Triangulo", NULL, NULL);
-	// Error check if the window fails to create
+	// Comprobar si la ventana no pudo crearse
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	// Introduce the window into the current context
+	// Introducir la ventana en el contexto actual
 	glfwMakeContextCurrent(window);
 
-	//Load GLAD so it configures OpenGL
+	// Cargar GLAD para que configure OpenGL
 	gladLoadGL();
-	// Specify the viewport of OpenGL in the Window
-	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
+	// Especificar el viewport de OpenGL dentro de la ventana
+	// En este caso el viewport va desde x = 0, y = 0, hasta x = 800, y = 800
 	glViewport(0, 0, 800, 800);
 
 
-	
-	// Generates Shader object using shaders defualt.vert and default.frag
+
+	// Generar el objeto Shader utilizando los shaders default.vert y default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
 
 
-	// Generates Vertex Array Object and binds it
+	// Generar el Vertex Array Object y enlazarlo
 	VAO VAO1;
 	VAO1.Bind();
 
-	// Generates Vertex Buffer Object and links it to vertices
+	// Generar el Vertex Buffer Object y enlazarlo con los vértices
 	VBO VBO1(vertices, sizeof(vertices));
-	// Generates Element Buffer Object and links it to indices
-	
+	// Generar el Element Buffer Object y enlazarlo con los índices
+
 	//EBO EBO1(indices, sizeof(indices));
 
-	// Links VBO to VAO
+	// Enlazar el VBO con el VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	// Unbind all to prevent accidentally modifying them
+	// Desenlazar todos los objetos para evitar modificarlos accidentalmente
 	VAO1.Unbind();
 	VBO1.Unbind();
-	
+
 	//EBO1.Unbind();
 
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
-	// Main while loop
+	// Bucle principal
 	while (!glfwWindowShouldClose(window))
 	{
-		// Specify the color of the background
+		// Especificar el color del fondo
 		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		
+
 		glClearColor(0.2f, 0.6f, 0.3f, 1.0f); // verde
 
-		// Clean the back buffer and assign the new color to it
+		// Limpiar el búfer trasero y asignarle el nuevo color
 		glClear(GL_COLOR_BUFFER_BIT);
-		// Tell OpenGL which Shader Program we want to use
+		// Indicarle a OpenGL qué programa de shaders queremos utilizar
 		shaderProgram.Activate();
-		
+
 		//glUniform1f(uniID, 0.5f);
-		
+
 		glUniform1f(uniID, -0.7f);
 
-		// Bind the VAO so OpenGL knows to use it
+		// Enlazar el VAO para que OpenGL sepa cuál utilizar
 		VAO1.Bind();
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawArrays(GL_TRIANGLES, 0, 21); // 7 triangulos x 3 vertices
-		// Swap the back buffer with the front buffer
+		// Dibujar primitivas: número de índices, tipo de dato de los índices, índice de los índices
+		glDrawArrays(GL_TRIANGLES, 0, 21); // 7 triángulos x 3 vértices
+		// Intercambiar el búfer trasero con el búfer frontal
 		glfwSwapBuffers(window);
-		// Take care of all GLFW events
+		// Gestionar todos los eventos de GLFW
 		glfwPollEvents();
 	}
 
 
 
-	// Delete all the objects we've created
+	// Eliminar todos los objetos que hemos creado
 	VAO1.Delete();
 	VBO1.Delete();
-	
+
 	//EBO1.Delete();
-	
+
 	shaderProgram.Delete();
-	// Delete window before ending the program
+	// Eliminar la ventana antes de finalizar el programa
 	glfwDestroyWindow(window);
-	// Terminate GLFW before ending the program
+	// Finalizar GLFW antes de terminar el programa
 	glfwTerminate();
 	return 0;
 }
