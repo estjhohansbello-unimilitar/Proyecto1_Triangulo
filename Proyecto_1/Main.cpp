@@ -15,7 +15,7 @@
 // Coordenadas / Color
 GLfloat vertices[] =
 {
-    // --- Oreja izquierda ---
+    /*// --- Oreja izquierda ---
     -0.55f,  1.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v0
     -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 0.0f, // v1
      0.00f,  0.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v2
@@ -24,6 +24,7 @@ GLfloat vertices[] =
       0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v3
       0.00f,  0.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v4
       0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 1.0f, // v5
+      */
 
       // --- Cabeza ---
       -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 1.0f, // v6
