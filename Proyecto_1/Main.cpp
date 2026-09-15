@@ -1,190 +1,321 @@
-#include<iostream>
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-#include"shaderClass.h"
-#include"VAO.h"
-#include"VBO.h"
-#include"EBO.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
+#include "shaderClass.h"
+#include "VAO.h"
+#include "VBO.h"
+#include "EBO.h"
 
-
-// Vertices coordinates
-// Vertices coordinates - GATO hecho de triangulos (tipo tangram)
-// Nota: como el shader multiplica por "scale" (0.5f), estas coordenadas
-// se ven mas grandes en el codigo de lo que realmente ocupan en pantalla.
-
-
-/* Triangulo 
+// Vertices del gato
+// Coordenadas / Color
 GLfloat vertices[] =
-{ //               COORDINATES                  /     COLORS           //
-	-0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower left corner
-	 0.5f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f, // Lower right corner
-	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,     1.0f, 0.6f,  0.32f, // Upper corner
-	-0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner left
-	 0.25f, 0.5f * float(sqrt(3)) * 1 / 6, 0.0f,     0.9f, 0.45f, 0.17f, // Inner right
-	 0.0f, -0.5f * float(sqrt(3)) * 1 / 3, 0.0f,     0.8f, 0.3f,  0.02f  // Inner down
-};
-
-
-*/
-
-
-GLfloat vertices[] =
-{ //          Coordenadas  /      COLOR     /
-
-	/*
-	
-	    V0
-	   /  \
-	  /	   \
-	V1------V2
-	
-	*/	
-	// --- Oreja izquierda ---
--0.55f,  1.00f, 0.0f,   1.0f, 0.0f, 0.0f, //v0
--0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 0.0f, //v1 mmmmm
-0.00f,  0.00f, 0.0f,   1.0f, 0.0f, 0.0f, //v2  ----
-
-// --- Oreja derecha ---
-0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 1.0f, //v3
-0.00f,  0.00f, 0.0f,   0.0f, 0.0f, 1.0f, //v4 ----
-0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 1.0f, //v5
-
- // --- Cabeza (triangulo ancho arriba, angosto abajo) ---
--0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 1.0f, //v6 mmmmmm 
-0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f,  //v7
-0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 1.0f, //v8
-// --- Cuerpo, mitad izquierda ---
-0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 0.0f, //v9
--0.85f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, //v10
-0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 1.0f, //v11
-
-// --- Cuerpo, mitad derecha ---
-0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 1.0f, //v12
-0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, //v13	
-0.85f, -0.90f, 0.0f,   1.0f, 0.0f, 0.0f, //v14
-
-/* // --- Cola, triangulo 1 ---
-0.20f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, //v15
-1.30f, -0.90f, 0.0f,   1.0f, 1.0f, 0.0f, //v16
-1.60f, -0.55f, 0.0f,   0.0f, 0.0f, 0.0f, //v17
-
- // --- Cola, triangulo 2 ---
-0.20f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, //v18
-1.60f, -0.55f, 0.0f,   0.0f, 0.0f, 0.0f, //v19
-0.50f, -0.55f, 0.0f,   0.0f, 1.0f, 1.0f,//v20
-*/
-};
-
-
-// Indices for vertices order
-/*GLuint indices[] =
 {
-	0, 3, 5, // Lower left triangle
-	3, 2, 4, // Lower right triangle
-	5, 4, 1 // Upper triangle
+    // --- Oreja izquierda ---
+    -0.55f,  1.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v0
+    -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 0.0f, // v1
+     0.00f,  0.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v2
+
+     // --- Oreja derecha ---
+      0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v3
+      0.00f,  0.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v4
+      0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 1.0f, // v5
+
+      // --- Cabeza ---
+      -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 1.0f, // v6
+       0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f, // v7
+       0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 1.0f, // v8
+
+       // --- Cuerpo, mitad izquierda ---
+        0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 0.0f, // v9
+       -0.85f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, // v10
+        0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 1.0f, // v11
+
+        // --- Cuerpo, mitad derecha ---
+         0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 1.0f, // v12
+         0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, // v13
+         0.85f, -0.90f, 0.0f,   1.0f, 0.0f, 0.0f, // v14
 };
-*/
+
 
 int main()
 {
-	// Inicializar GLFW
-	glfwInit();
+    // =========================================================
+    // INICIALIZAR GLFW
+    // =========================================================
 
-	// Indicarle a GLFW qué versión de OpenGL estamos utilizando
-	// En este caso estamos utilizando OpenGL 3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Indicarle a GLFW que estamos utilizando el perfil CORE
-	// Esto significa que solamente utilizaremos las funciones modernas
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwInit();
 
-	// Crear un objeto GLFWwindow de 800 por 800 píxeles, con el nombre "Proyecto1_Triangulo"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "Proyecto1_Triangulo", NULL, NULL);
-	// Comprobar si la ventana no pudo crearse
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	// Introducir la ventana en el contexto actual
-	glfwMakeContextCurrent(window);
+    // OpenGL 3.3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	// Cargar GLAD para que configure OpenGL
-	gladLoadGL();
-	// Especificar el viewport de OpenGL dentro de la ventana
-	// En este caso el viewport va desde x = 0, y = 0, hasta x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+    // Perfil CORE
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // Configurar buffer de profundidad de 24 bits
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
 
+    // =========================================================
+    // CREAR VENTANA
+    // =========================================================
 
-	// Generar el objeto Shader utilizando los shaders default.vert y default.frag
-	Shader shaderProgram("default.vert", "default.frag");
+    GLFWwindow* window = glfwCreateWindow(
+        800,
+        800,
+        "Proyecto1_Triangulo",
+        NULL,
+        NULL
+    );
 
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
 
-
-	// Generar el Vertex Array Object y enlazarlo
-	VAO VAO1;
-	VAO1.Bind();
-
-	// Generar el Vertex Buffer Object y enlazarlo con los vértices
-	VBO VBO1(vertices, sizeof(vertices));
-	// Generar el Element Buffer Object y enlazarlo con los índices
-
-	//EBO EBO1(indices, sizeof(indices));
-
-	// Enlazar el VBO con el VAO
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	// Desenlazar todos los objetos para evitar modificarlos accidentalmente
-	VAO1.Unbind();
-	VBO1.Unbind();
-
-	//EBO1.Unbind();
-
-	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
-
-	// Bucle principal
-	while (!glfwWindowShouldClose(window))
-	{
-		// Especificar el color del fondo
-		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-
-		glClearColor(0.2f, 0.6f, 0.3f, 1.0f); // verde
-
-		// Limpiar el búfer trasero y asignarle el nuevo color
-		glClear(GL_COLOR_BUFFER_BIT);
-		// Indicarle a OpenGL qué programa de shaders queremos utilizar
-		shaderProgram.Activate();
-
-		//glUniform1f(uniID, 0.5f);
-
-		glUniform1f(uniID, -0.7f);
-
-		// Enlazar el VAO para que OpenGL sepa cuál utilizar
-		VAO1.Bind();
-		// Dibujar primitivas: número de índices, tipo de dato de los índices, índice de los índices
-		glDrawArrays(GL_TRIANGLES, 0, 21); // 7 triángulos x 3 vértices
-		// Intercambiar el búfer trasero con el búfer frontal
-		glfwSwapBuffers(window);
-		// Gestionar todos los eventos de GLFW
-		glfwPollEvents();
-	}
+    // Hacer que la ventana sea el contexto actual
+    glfwMakeContextCurrent(window);
 
 
+    // =========================================================
+    // CARGAR GLAD
+    // =========================================================
 
-	// Eliminar todos los objetos que hemos creado
-	VAO1.Delete();
-	VBO1.Delete();
+    gladLoadGL();
 
-	//EBO1.Delete();
+    // Configurar viewport
+    glViewport(0, 0, 800, 800);
 
-	shaderProgram.Delete();
-	// Eliminar la ventana antes de finalizar el programa
-	glfwDestroyWindow(window);
-	// Finalizar GLFW antes de terminar el programa
-	glfwTerminate();
-	return 0;
+
+    // =========================================================
+    // CONFIGURAR BUFFER DE PROFUNDIDAD
+    // =========================================================
+
+    glEnable(GL_DEPTH_TEST);
+
+    // El fragmento más cercano a la cámara gana
+    glDepthFunc(GL_LESS);
+
+
+    // =========================================================
+    // CREAR SHADER
+    // =========================================================
+
+    Shader shaderProgram("default.vert", "default.frag");
+
+
+    // =========================================================
+    // CREAR VAO
+    // =========================================================
+
+    VAO VAO1;
+    VAO1.Bind();
+
+
+    // =========================================================
+    // CREAR VBO
+    // =========================================================
+
+    VBO VBO1(vertices, sizeof(vertices));
+
+
+    // =========================================================
+    // CONFIGURAR ATRIBUTOS
+    // =========================================================
+
+    // Posición
+    VAO1.LinkAttrib(
+        VBO1,
+        0,
+        3,
+        GL_FLOAT,
+        6 * sizeof(float),
+        (void*)0
+    );
+
+    // Color
+    VAO1.LinkAttrib(
+        VBO1,
+        1,
+        3,
+        GL_FLOAT,
+        6 * sizeof(float),
+        (void*)(3 * sizeof(float))
+    );
+
+
+    // Desenlazar
+    VAO1.Unbind();
+    VBO1.Unbind();
+
+
+    // =========================================================
+    // VARIABLE UNIFORME
+    // =========================================================
+
+    // Buscar la variable uMVP dentro del shader
+    GLuint uniMVP = glGetUniformLocation(
+        shaderProgram.ID,
+        "uMVP"
+    );
+
+
+    // =========================================================
+    // RENDER LOOP
+    // =========================================================
+
+    while (!glfwWindowShouldClose(window))
+    {
+        // -----------------------------------------------------
+        // COLOR DEL FONDO
+        // -----------------------------------------------------
+
+        glClearColor(
+            0.2f,
+            0.6f,
+            0.3f,
+            1.0f
+        );
+
+
+        // -----------------------------------------------------
+        // LIMPIAR COLOR Y PROFUNDIDAD
+        // -----------------------------------------------------
+
+        glClear(
+            GL_COLOR_BUFFER_BIT |
+            GL_DEPTH_BUFFER_BIT
+        );
+
+
+        // -----------------------------------------------------
+        // ACTIVAR SHADER
+        // -----------------------------------------------------
+
+        shaderProgram.Activate();
+
+
+        // =====================================================
+        // MATRIZ MODELO
+        // =====================================================
+
+        glm::mat4 model = glm::mat4(1.0f);
+
+
+        // =====================================================
+        // MATRIZ DE VISTA
+        // =====================================================
+
+        glm::mat4 view = glm::lookAt(
+
+            // Posición de la cámara
+            glm::vec3(
+                0.0f,
+                0.0f,
+                3.0f
+            ),
+
+            // Punto al que mira
+            glm::vec3(
+                0.0f,
+                0.0f,
+                0.0f
+            ),
+
+            // Dirección hacia arriba
+            glm::vec3(
+                0.0f,
+                1.0f,
+                0.0f
+            )
+        );
+
+
+        // =====================================================
+        // MATRIZ DE PROYECCIÓN
+        // =====================================================
+
+        glm::mat4 projection = glm::perspective(
+
+            // Campo de visión
+            glm::radians(45.0f),
+
+            // Relación ancho / alto
+            800.0f / 800.0f,
+
+            // Distancia mínima
+            0.1f,
+
+            // Distancia máxima
+            100.0f
+        );
+
+
+        // =====================================================
+        // MATRIZ MVP
+        // =====================================================
+
+        glm::mat4 mvp =
+            projection *
+            view *
+            model;
+
+
+        // =====================================================
+        // ACTUALIZAR VARIABLE UNIFORME
+        // =====================================================
+
+        glUniformMatrix4fv(
+            uniMVP,
+            1,
+            GL_FALSE,
+            glm::value_ptr(mvp)
+        );
+
+
+        // =====================================================
+        // DIBUJAR GATO
+        // =====================================================
+
+        VAO1.Bind();
+
+        glDrawArrays(
+            GL_TRIANGLES,
+            0,
+            15
+        );
+
+
+        // =====================================================
+        // INTERCAMBIAR BUFFERS
+        // =====================================================
+
+        glfwSwapBuffers(window);
+
+
+        // Procesar eventos
+        glfwPollEvents();
+    }
+
+
+    // =========================================================
+    // LIBERAR RECURSOS
+    // =========================================================
+
+    VAO1.Delete();
+    VBO1.Delete();
+
+    shaderProgram.Delete();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
 }
