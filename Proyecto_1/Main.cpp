@@ -1,75 +1,59 @@
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <cmath> // para las funciones seno y coseno
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h> // para cargar las funciones de OpenGL
+#include <GLFW/glfw3.h> // para crear la ventana y el contexto de OpenGL
+
+#include <glm/glm.hpp> // permite trabajar con vectores y matrices
+#include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shaderClass.h"
+#include "shaderClass.h" 
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
 
-// Vertices del gato
-// Coordenadas / Color
+
+// ------------------------------------------------------------
+// TRIÁNGULO
+// Cada vértice tiene:
+// posición X,Y,Z + color R,G,B
+// ------------------------------------------------------------
+
 GLfloat vertices[] =
 {
-    /*// --- Oreja izquierda ---
-    -0.55f,  1.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v0
-    -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 0.0f, // v1
-     0.00f,  0.00f, 0.0f,   1.0f, 0.0f, 0.0f, // v2
-
-     // --- Oreja derecha ---
-      0.55f,  1.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v3
-      0.00f,  0.00f, 0.0f,   0.0f, 0.0f, 1.0f, // v4
-      0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 1.0f, // v5
-      */
-
-      // --- Cabeza ---
-      -0.85f,  0.50f, 0.0f,   1.0f, 0.0f, 1.0f, // v6
-       0.85f,  0.50f, 0.0f,   0.0f, 0.0f, 0.0f, // v7
-       0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 1.0f, // v8
-
-       // --- Cuerpo, mitad izquierda ---
-        0.00f, -0.05f, 0.0f,   1.0f, 0.0f, 0.0f, // v9
-       -0.85f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, // v10
-        0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 1.0f, // v11
-
-        // --- Cuerpo, mitad derecha ---
-         0.00f, -0.05f, 0.0f,   0.0f, 0.0f, 1.0f, // v12
-         0.00f, -0.90f, 0.0f,   0.0f, 0.0f, 0.0f, // v13
-         0.85f, -0.90f, 0.0f,   1.0f, 0.0f, 0.0f, // v14
+    // Triángulo 1
+    // Posición                 // Color
+    -0.5f, -0.5f, 0.0f,        1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,        0.0f, 1.0f, 0.0f,
+     0.0f,  0.5f, 0.0f,        0.0f, 0.0f, 1.0f
 };
 
 
 int main()
 {
-    // =========================================================
-    // INICIALIZAR GLFW
-    // =========================================================
+    // --------------------------------------------------------
+    // INICIALIZAR GLFW 
+    // --------------------------------------------------------
 
     glfwInit();
 
-    // OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-    // Perfil CORE
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Configurar buffer de profundidad de 24 bits
+    // Activar buffer de profundidad
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
 
-    // =========================================================
+    // --------------------------------------------------------
     // CREAR VENTANA
-    // =========================================================
+    // --------------------------------------------------------
 
     GLFWwindow* window = glfwCreateWindow(
-        800,
-        800,
-        "Proyecto1_Triangulo",
+        800, 
+        800, 
+        "Proyecto OpenGL - 3 Triangulos 3D",
         NULL,
         NULL
     );
@@ -77,59 +61,58 @@ int main()
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
+
         glfwTerminate();
+
         return -1;
     }
 
-    // Hacer que la ventana sea el contexto actual
     glfwMakeContextCurrent(window);
 
 
-    // =========================================================
-    // CARGAR GLAD
-    // =========================================================
+    // --------------------------------------------------------
+    // INICIALIZAR GLAD
+    // --------------------------------------------------------
 
     gladLoadGL();
 
-    // Configurar viewport
     glViewport(0, 0, 800, 800);
 
 
-    // =========================================================
-    // CONFIGURAR BUFFER DE PROFUNDIDAD
-    // =========================================================
+    // --------------------------------------------------------
+    // DEPTH TEST
+    // --------------------------------------------------------
 
     glEnable(GL_DEPTH_TEST);
 
-    // El fragmento más cercano a la cámara gana
     glDepthFunc(GL_LESS);
 
 
-    // =========================================================
-    // CREAR SHADER
-    // =========================================================
+    // --------------------------------------------------------
+    // SHADER
+    // --------------------------------------------------------
 
     Shader shaderProgram("default.vert", "default.frag");
 
 
-    // =========================================================
-    // CREAR VAO
-    // =========================================================
+    // --------------------------------------------------------
+    // VAO
+    // --------------------------------------------------------
 
     VAO VAO1;
+
     VAO1.Bind();
 
 
-    // =========================================================
-    // CREAR VBO
-    // =========================================================
+    // --------------------------------------------------------
+    // VBO
+    // --------------------------------------------------------
 
-    VBO VBO1(vertices, sizeof(vertices));
+    VBO VBO1(
+        vertices,
+        sizeof(vertices)
+    );
 
-
-    // =========================================================
-    // CONFIGURAR ATRIBUTOS
-    // =========================================================
 
     // Posición
     VAO1.LinkAttrib(
@@ -140,6 +123,7 @@ int main()
         6 * sizeof(float),
         (void*)0
     );
+
 
     // Color
     VAO1.LinkAttrib(
@@ -152,31 +136,29 @@ int main()
     );
 
 
-    // Desenlazar
     VAO1.Unbind();
     VBO1.Unbind();
 
 
-    // =========================================================
-    // VARIABLE UNIFORME
-    // =========================================================
+    // --------------------------------------------------------
+    // UNIFORM
+    // --------------------------------------------------------
 
-    // Buscar la variable uMVP dentro del shader
     GLuint uniMVP = glGetUniformLocation(
         shaderProgram.ID,
         "uMVP"
     );
 
 
-    // =========================================================
-    // RENDER LOOP
-    // =========================================================
+    // --------------------------------------------------------
+    // Render loop 
+    // --------------------------------------------------------
 
     while (!glfwWindowShouldClose(window))
     {
-        // -----------------------------------------------------
-        // COLOR DEL FONDO
-        // -----------------------------------------------------
+        // ----------------------------------------------------
+        // LIMPIAR PANTALLA
+        // ----------------------------------------------------
 
         glClearColor(
             0.2f,
@@ -185,118 +167,227 @@ int main()
             1.0f
         );
 
-
-        // -----------------------------------------------------
-        // LIMPIAR COLOR Y PROFUNDIDAD
-        // -----------------------------------------------------
-
         glClear(
             GL_COLOR_BUFFER_BIT |
             GL_DEPTH_BUFFER_BIT
         );
 
 
-        // -----------------------------------------------------
-        // ACTIVAR SHADER
-        // -----------------------------------------------------
-
+        // Activar shader
         shaderProgram.Activate();
 
 
-        // =====================================================
-        // MATRIZ MODELO
-        // =====================================================
+        // ----------------------------------------------------
+        // TIEMPO
+        // ----------------------------------------------------
 
-        glm::mat4 model = glm::mat4(1.0f);
+        float tiempo = glfwGetTime();
 
 
-        // =====================================================
-        // MATRIZ DE VISTA
-        // =====================================================
-        glm::mat4 view = glm::lookAt(
-            glm::vec3(0.0f, 0.0f, 3.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f)
+        // ----------------------------------------------------
+        // CÁMARA GIRATORIA
+        // ----------------------------------------------------
+
+		float radio = 5.0f; // Radio de la órbita de la cámara
+
+        float cameraX = 
+			sin(tiempo * 0.5f) * radio; // Velocidad de rotación de la cámara
+
+        float cameraZ =
+			cos(tiempo * 0.5f) * radio; // Velocidad de rotación de la cámara
+
+
+        glm::mat4 view = glm::lookAt( 
+
+            // Posición de la cámara
+            glm::vec3(
+                cameraX,
+                1.5f,
+                cameraZ
+            ),
+
+            // Punto al que mira
+            glm::vec3(
+                0.0f,
+                0.0f,
+                0.0f
+            ),
+
+            // Arriba
+            glm::vec3(
+                0.0f,
+                1.0f,
+                0.0f
+            )
         );
 
 
-        // =====================================================
-        // MATRIZ DE PROYECCIÓN
-        // =====================================================
+        // ----------------------------------------------------
+        // PROYECCIÓN
+        // ----------------------------------------------------
 
-        glm::mat4 projection = glm::perspective(
+        glm::mat4 projection =
+            glm::perspective(
 
-            // Campo de visión
-            glm::radians(45.0f),
+                glm::radians(45.0f),
 
-            // Relación ancho / alto
-            800.0f / 800.0f,
+                800.0f / 800.0f,
 
-            // Distancia mínima
-            0.1f,
+                0.1f,
 
-            // Distancia máxima
-            100.0f
-        );
+                100.0f
+            );
 
 
-        // =====================================================
-        // MATRIZ MVP
-        // =====================================================
+        // ----------------------------------------------------
+        // TRIÁNGULO 1
+        // ----------------------------------------------------
 
-        glm::mat4 mvp =
+        glm::mat4 model1 =
+            glm::mat4(1.0f);
+
+
+        // Lo colocamos adelante
+        model1 =
+            glm::translate(
+                model1,
+                glm::vec3(
+                    0.0f,
+                    0.0f,
+                    0.0f
+                )
+            );
+
+
+        glm::mat4 mvp1 =
             projection *
             view *
-            model;
+            model1;
 
-
-        // =====================================================
-        // ACTUALIZAR VARIABLE UNIFORME
-        // =====================================================
 
         glUniformMatrix4fv(
             uniMVP,
             1,
             GL_FALSE,
-            glm::value_ptr(mvp)
+            glm::value_ptr(mvp1)
         );
 
 
-        // =====================================================
-        // DIBUJAR GATO
-        // =====================================================
-
         VAO1.Bind();
+
 
         glDrawArrays(
             GL_TRIANGLES,
             0,
-            15
+            3
         );
 
 
-        // =====================================================
-        // INTERCAMBIAR BUFFERS
-        // =====================================================
+        // ----------------------------------------------------
+        // TRIÁNGULO 2
+        // ----------------------------------------------------
+
+        glm::mat4 model2 =
+            glm::mat4(1.0f);
+
+
+        // Lo colocamos detrás
+        model2 =
+            glm::translate(
+                model2,
+                glm::vec3(
+                    0.0f,
+                    0.0f,
+                    -1.5f
+                )
+            );
+
+
+        glm::mat4 mvp2 =
+            projection *
+            view *
+            model2;
+
+
+        glUniformMatrix4fv(
+            uniMVP,
+            1,
+            GL_FALSE,
+            glm::value_ptr(mvp2)
+        );
+
+
+        glDrawArrays(
+            GL_TRIANGLES,
+            0,
+            3
+        );
+
+
+        // ----------------------------------------------------
+        // TRIÁNGULO 3
+        // ----------------------------------------------------
+
+        glm::mat4 model3 =
+            glm::mat4(1.0f);
+
+
+        // Más atrás
+        model3 =
+            glm::translate(
+                model3,
+                glm::vec3(
+                    0.0f,
+                    0.0f,
+                    -3.0f
+                )
+            );
+
+		// Más pequeño
+        glm::mat4 mvp3 =
+            projection *
+            view *
+            model3;
+
+
+        glUniformMatrix4fv(
+            uniMVP,
+            1,
+            GL_FALSE,
+            glm::value_ptr(mvp3)
+        );
+
+
+        glDrawArrays(
+            GL_TRIANGLES,
+            0,
+            3
+        );
+
+
+        // ----------------------------------------------------
+        // TERMINAR FRAME
+        // ----------------------------------------------------
 
         glfwSwapBuffers(window);
 
-
-        // Procesar eventos
         glfwPollEvents();
     }
 
 
-    // =========================================================
+    // --------------------------------------------------------
     // LIBERAR RECURSOS
-    // =========================================================
+    // --------------------------------------------------------
 
     VAO1.Delete();
+
     VBO1.Delete();
 
     shaderProgram.Delete();
 
+
     glfwDestroyWindow(window);
+
     glfwTerminate();
 
     return 0;
