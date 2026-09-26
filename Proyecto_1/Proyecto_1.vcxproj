@@ -152,12 +152,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\FilesClaudePyramid\Camera.cpp" />
-    <ClCompile Include="..\..\FilesClaudePyramid\stb_image.cpp" />
-    <ClCompile Include="..\..\FilesClaudePyramid\Texture.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="shaderClass.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
@@ -167,10 +168,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\FilesClaudePyramid\Camera.h" />
-    <ClInclude Include="..\..\FilesClaudePyramid\stb_image.h" />
-    <ClInclude Include="..\..\FilesClaudePyramid\Texture.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="shaderClass.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
   </ItemGroup>

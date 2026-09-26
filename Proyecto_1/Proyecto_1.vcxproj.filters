@@ -39,11 +39,14 @@
     <ClCompile Include="..\..\FilesClaudePyramid\Camera.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FilesClaudePyramid\stb_image.cpp">
-      <Filter>Archivos de origen</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Archivos de encabezado</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\FilesClaudePyramid\Texture.cpp">
-      <Filter>Archivos de origen</Filter>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Archivos de encabezado</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Archivos de encabezado</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,10 +73,13 @@
     <ClInclude Include="..\..\FilesClaudePyramid\Camera.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FilesClaudePyramid\stb_image.h">
+    <ClInclude Include="Camera.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\FilesClaudePyramid\Texture.h">
+    <ClInclude Include="stb_image.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

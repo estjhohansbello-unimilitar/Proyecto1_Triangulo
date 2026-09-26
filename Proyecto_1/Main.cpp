@@ -49,7 +49,7 @@ GLuint indices[] =
 int main()
 {
     // --------------------------------------------------------
-    // INICIALIZAR GLFW 
+    // INICIALIZAR GLFW
     // --------------------------------------------------------
 
     glfwInit();
@@ -67,9 +67,9 @@ int main()
     // --------------------------------------------------------
 
     GLFWwindow* window = glfwCreateWindow(
-        800, 
-        800, 
-        "Proyecto OpenGL - 3 Triangulos 3D",
+        800,
+        800,
+        "Proyecto OpenGL - Piramide con textura",
         NULL,
         NULL
     );
@@ -84,6 +84,7 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
+
 
 
     // --------------------------------------------------------
@@ -105,56 +106,70 @@ int main()
 
 
     // --------------------------------------------------------
-    // SHADER
-    // --------------------------------------------------------
+     // SHADER
+     // --------------------------------------------------------
 
     Shader shaderProgram("default.vert", "default.frag");
 
 
     // --------------------------------------------------------
-    // VAO
+    // VAO / VBO / EBO
     // --------------------------------------------------------
 
     VAO VAO1;
-
     VAO1.Bind();
 
+    VBO VBO1(vertices, sizeof(vertices));
+    EBO EBO1(indices, sizeof(indices));
 
-    // --------------------------------------------------------
-    // VBO
-    // --------------------------------------------------------
-
-    VBO VBO1(
-        vertices,
-        sizeof(vertices)
-    );
-
-
-    // Posición
+    // Posición -> location 0 (3 floats)
     VAO1.LinkAttrib(
         VBO1,
         0,
         3,
         GL_FLOAT,
-        6 * sizeof(float),
+        8 * sizeof(float),
         (void*)0
     );
 
-
-    // Color
+    // Color -> location 1 (3 floats)
     VAO1.LinkAttrib(
         VBO1,
         1,
         3,
         GL_FLOAT,
-        6 * sizeof(float),
+        8 * sizeof(float),
         (void*)(3 * sizeof(float))
     );
 
+    // Coordenada de textura -> location 2 (2 floats)
+    VAO1.LinkAttrib(
+        VBO1,
+        2,
+        2,
+        GL_FLOAT,
+        8 * sizeof(float),
+        (void*)(6 * sizeof(float))
+    );
 
     VAO1.Unbind();
     VBO1.Unbind();
+    EBO1.Unbind();
 
+
+    // --------------------------------------------------------
+    // TEXTURA
+    // --------------------------------------------------------
+
+    Texture pyramidTex(
+        "texture.png",
+        GL_TEXTURE_2D,
+        GL_TEXTURE0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE
+    );
+
+    pyramidTex.texUnit(shaderProgram, "tex0", 0);
 
     // --------------------------------------------------------
     // UNIFORM
@@ -167,9 +182,17 @@ int main()
 
 
     // --------------------------------------------------------
-    // Render loop 
+    // CÁMARA
     // --------------------------------------------------------
 
+    Camera camera(800, 800, glm::vec3(0.0f, 1.0f, 3.0f));
+
+    float lastFrame = 0.0f;
+
+
+    // --------------------------------------------------------
+    // Render loop
+    // --------------------------------------------------------
     while (!glfwWindowShouldClose(window))
     {
         // ----------------------------------------------------
