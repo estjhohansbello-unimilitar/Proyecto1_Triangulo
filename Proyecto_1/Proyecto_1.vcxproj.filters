@@ -77,4 +77,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\FilesClaudePyramid\texture.png">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
