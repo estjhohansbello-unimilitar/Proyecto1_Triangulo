@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\FilesClaudePyramid\Camera.cpp" />
     <ClCompile Include="..\..\FilesClaudePyramid\stb_image.cpp" />
+    <ClCompile Include="..\..\FilesClaudePyramid\Texture.cpp" />
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\FilesClaudePyramid\Camera.h" />
     <ClInclude Include="..\..\FilesClaudePyramid\stb_image.h" />
+    <ClInclude Include="..\..\FilesClaudePyramid\Texture.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="shaderClass.h" />
     <ClInclude Include="VAO.h" />
