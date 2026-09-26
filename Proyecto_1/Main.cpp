@@ -1,14 +1,13 @@
 #include <iostream>
-#include <cmath> // para las funciones seno y coseno
 
 #include <glad/glad.h> // para cargar las funciones de OpenGL
 #include <GLFW/glfw3.h> // para crear la ventana y el contexto de OpenGL
 
 #include <glm/glm.hpp> // permite trabajar con vectores y matrices
-#include <glm/gtc/matrix_transform.hpp> 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shaderClass.h" 
+#include "shaderClass.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
@@ -16,21 +15,35 @@
 #include "Camera.h"
 
 
-
 // ------------------------------------------------------------
-// TRIÁNGULO
+// PIRÁMIDE
 // Cada vértice tiene:
-// posición X,Y,Z + color R,G,B
+// posición X,Y,Z  +  color R,G,B  +  coordenada de textura U,V
+// Base cuadrada (4 vértices) + punta (1 vértice) = 5 vértices
 // ------------------------------------------------------------
 
 GLfloat vertices[] =
-{
-    // Triángulo 1
-    // Posición                 // Color
-    -0.5f, -0.5f, 0.0f,        1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, 0.0f,        0.0f, 1.0f, 0.0f,
-     0.0f,  0.5f, 0.0f,        0.0f, 0.0f, 1.0f
+{ //     POSICIÓN            //      COLOR           //  TEXCOORD
+    -0.5f, 0.0f,  0.5f,       0.83f, 0.70f, 0.44f,     0.0f, 0.0f,
+    -0.5f, 0.0f, -0.5f,       0.83f, 0.70f, 0.44f,     5.0f, 0.0f,
+     0.5f, 0.0f, -0.5f,       0.83f, 0.70f, 0.44f,     0.0f, 0.0f,
+     0.5f, 0.0f,  0.5f,       0.83f, 0.70f, 0.44f,     5.0f, 0.0f,
+     0.0f, 0.8f,  0.0f,       0.92f, 0.86f, 0.76f,     2.5f, 5.0f
 };
+
+// Índices: qué vértices forman cada triángulo de la pirámide
+// (2 triángulos para la base + 4 triángulos para las caras laterales)
+GLuint indices[] =
+{
+    0, 1, 2,
+    0, 2, 3,
+    0, 1, 4,
+    1, 2, 4,
+    2, 3, 4,
+    3, 0, 4
+};
+
+
 
 
 int main()
