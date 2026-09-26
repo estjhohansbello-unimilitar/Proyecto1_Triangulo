@@ -196,20 +196,28 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         // ----------------------------------------------------
+        // DELTA TIME (para que la velocidad no dependa del FPS)
+        // ----------------------------------------------------
+
+        float currentFrame = (float)glfwGetTime();
+        float deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+
+        // ----------------------------------------------------
+        // INPUT DE CÁMARA (flechas del teclado)
+        // ----------------------------------------------------
+
+        camera.Inputs(window, deltaTime);
+
+
+        // ----------------------------------------------------
         // LIMPIAR PANTALLA
         // ----------------------------------------------------
 
-        glClearColor(
-            0.2f,
-            0.6f,
-            0.3f,
-            1.0f
-        );
+        glClearColor(0.2f, 0.6f, 0.3f, 1.0f);
 
-        glClear(
-            GL_COLOR_BUFFER_BIT |
-            GL_DEPTH_BUFFER_BIT
-        );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         // Activar shader
@@ -217,190 +225,43 @@ int main()
 
 
         // ----------------------------------------------------
-        // TIEMPO
+        // MATRICES DE VISTA Y PROYECCIÓN (desde la cámara)
         // ----------------------------------------------------
 
-        float tiempo = glfwGetTime();
+        glm::mat4 view = camera.GetViewMatrix();
 
-
-        // ----------------------------------------------------
-        // CÁMARA GIRATORIA
-        // ----------------------------------------------------
-
-		float radio = 5.0f; // Radio de la órbita de la cámara
-
-        float cameraX = 
-			sin(tiempo * 0.5f) * radio; // Velocidad de rotación de la cámara
-
-        float cameraZ =
-			cos(tiempo * 0.5f) * radio; // Velocidad de rotación de la cámara
-
-
-        glm::mat4 view = glm::lookAt( 
-
-            // Posición de la cámara
-            glm::vec3(
-                cameraX,
-                1.5f,
-                cameraZ
-            ),
-
-            // Punto al que mira
-            glm::vec3(
-                0.0f,
-                0.0f,
-                0.0f
-            ),
-
-            // Arriba
-            glm::vec3(
-                0.0f,
-                1.0f,
-                0.0f
-            )
-        );
+        glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f);
 
 
         // ----------------------------------------------------
-        // PROYECCIÓN
+        // MODELO DE LA PIRÁMIDE (quieta en el origen)
         // ----------------------------------------------------
 
-        glm::mat4 projection =
-            glm::perspective(
+        glm::mat4 model = glm::mat4(1.0f);
 
-                glm::radians(45.0f),
-
-                800.0f / 800.0f,
-
-                0.1f,
-
-                100.0f
-            );
-
-
-        // ----------------------------------------------------
-        // TRIÁNGULO 1
-        // ----------------------------------------------------
-
-        glm::mat4 model1 =
-            glm::mat4(1.0f);
-
-
-        // Lo colocamos adelante
-        model1 =
-            glm::translate(
-                model1,
-                glm::vec3(
-                    0.0f,
-                    0.0f,
-                    0.0f
-                )
-            );
-
-
-        glm::mat4 mvp1 =
-            projection *
-            view *
-            model1;
-
+        glm::mat4 mvp = projection * view * model;
 
         glUniformMatrix4fv(
             uniMVP,
             1,
             GL_FALSE,
-            glm::value_ptr(mvp1)
+            glm::value_ptr(mvp)
         );
 
+
+        // ----------------------------------------------------
+        // DIBUJAR LA PIRÁMIDE
+        // ----------------------------------------------------
+
+        pyramidTex.Bind();
 
         VAO1.Bind();
 
-
-        glDrawArrays(
+        glDrawElements(
             GL_TRIANGLES,
-            0,
-            3
-        );
-
-
-        // ----------------------------------------------------
-        // TRIÁNGULO 2
-        // ----------------------------------------------------
-
-        glm::mat4 model2 =
-            glm::mat4(1.0f);
-
-
-        // Lo colocamos detrás
-        model2 =
-            glm::translate(
-                model2,
-                glm::vec3(
-                    0.0f,
-                    0.0f,
-                    -1.5f
-                )
-            );
-
-
-        glm::mat4 mvp2 =
-            projection *
-            view *
-            model2;
-
-
-        glUniformMatrix4fv(
-            uniMVP,
-            1,
-            GL_FALSE,
-            glm::value_ptr(mvp2)
-        );
-
-
-        glDrawArrays(
-            GL_TRIANGLES,
-            0,
-            3
-        );
-
-
-        // ----------------------------------------------------
-        // TRIÁNGULO 3
-        // ----------------------------------------------------
-
-        glm::mat4 model3 =
-            glm::mat4(1.0f);
-
-
-        // Más atrás
-        model3 =
-            glm::translate(
-                model3,
-                glm::vec3(
-                    0.0f,
-                    0.0f,
-                    -3.0f
-                )
-            );
-
-		// Más pequeño
-        glm::mat4 mvp3 =
-            projection *
-            view *
-            model3;
-
-
-        glUniformMatrix4fv(
-            uniMVP,
-            1,
-            GL_FALSE,
-            glm::value_ptr(mvp3)
-        );
-
-
-        glDrawArrays(
-            GL_TRIANGLES,
-            0,
-            3
+            sizeof(indices) / sizeof(int),
+            GL_UNSIGNED_INT,
+            0
         );
 
 
@@ -419,11 +280,10 @@ int main()
     // --------------------------------------------------------
 
     VAO1.Delete();
-
     VBO1.Delete();
-
+    EBO1.Delete();
+    pyramidTex.Delete();
     shaderProgram.Delete();
-
 
     glfwDestroyWindow(window);
 
