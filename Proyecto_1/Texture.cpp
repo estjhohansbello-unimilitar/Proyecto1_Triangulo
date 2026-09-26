@@ -15,7 +15,13 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	// mientras que la mayoría de formatos de imagen lo guardan arriba-izquierda
 	stbi_set_flip_vertically_on_load(true);
 
-	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 0);
+	// Forzamos 4 canales (RGBA) sin importar cuántos tenga la imagen original.
+	// Esto es importante: si la imagen no tuviera alpha (solo RGB, 3 canales)
+	// y aquí pidiéramos "los canales que tenga" (0), el buffer resultante
+	// tendría menos bytes por píxel de los que luego se le dicen a OpenGL
+	// que lea en glTexImage2D (GL_RGBA = 4 canales). Esa discordancia hace
+	// que el driver lea memoria fuera del buffer -> crash de acceso inválido.
+	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 4);
 
 	if (bytes == nullptr)
 	{
