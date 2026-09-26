@@ -78,8 +78,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\FilesClaudePyramid\texture.png">
-      <Filter>Archivos de recursos\Shaders</Filter>
+    <Image Include="texture.png">
+      <Filter>Archivos de recursos</Filter>
     </Image>
   </ItemGroup>
 </Project>
