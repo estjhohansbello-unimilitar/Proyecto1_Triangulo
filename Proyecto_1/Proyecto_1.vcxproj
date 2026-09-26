@@ -151,7 +151,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\FilesClaudePyramid\Camera.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="glad.c" />
@@ -167,7 +166,6 @@
     <None Include="default.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\FilesClaudePyramid\Camera.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="shaderClass.h" />
