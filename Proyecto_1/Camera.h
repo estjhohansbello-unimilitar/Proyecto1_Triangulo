@@ -28,8 +28,8 @@ public:
 	// --- Control de rotación con el mouse (estilo cámara FPS) ---
 
 	// Ángulo horizontal (izquierda/derecha) y vertical (arriba/abajo) de la vista
-	float Yaw = -90.0f; // Inicialmente mirando hacia el eje -Z
-	float Pitch = 0.0f; // Inicialmente sin inclinación
+	float Yaw = -90.0f; // Inicialmente mirando hacia el eje -Z, yaw = -90° para que la cámara mire hacia adelante
+	float Pitch = 0.0f; // Inicialmente sin inclinación, pitch = 0° para que la cámara mire al horizonte
 
 	// Qué tan sensible es la cámara al movimiento del mouse
 	float sensitivity = 0.1f;
