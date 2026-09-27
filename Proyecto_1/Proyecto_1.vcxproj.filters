@@ -78,7 +78,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="texture.png">
+    <Image Include="texture1.png">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="texture2.jpeg">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="texture3.jpg">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="calei.jpg">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="calei2.jpg">
       <Filter>Archivos de recursos</Filter>
     </Image>
   </ItemGroup>

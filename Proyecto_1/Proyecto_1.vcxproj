@@ -175,7 +175,11 @@
     <ClInclude Include="VBO.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="texture.png" />
+    <Image Include="calei.jpg" />
+    <Image Include="calei2.jpg" />
+    <Image Include="texture1.png" />
+    <Image Include="texture2.jpeg" />
+    <Image Include="texture3.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
