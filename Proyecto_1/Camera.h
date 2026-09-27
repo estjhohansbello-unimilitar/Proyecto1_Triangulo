@@ -4,15 +4,15 @@
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
+#include<glm/gtc/matrix_transform.hpp> // para funciones lookat y perspective
 
 class Camera
 {
 public:
-	glm::vec3 Position;
+	glm::vec3 Position; // Donde esta parada la camara en el mundo 3d
 
-	// Hacia dónde "mira" la cámara (vector de dirección)
-	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+	// Hacia dónde mira la cámara (vector de dirección)
+	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f); 
 
 	// Vector "arriba" del mundo
 	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -26,9 +26,9 @@ public:
 	Camera(int width, int height, glm::vec3 position);
 
 	// Arma la matriz de vista (dónde está la cámara y hacia dónde mira)
-	glm::mat4 GetViewMatrix();
+	glm::mat4 GetViewMatrix(); 
 
-	// Arma la matriz de proyección (perspectiva, FOV, planos near/far)
+	// Arma la matriz de proyección (perspectiva, FOV, planos near/far) la que simula la perspectiva
 	glm::mat4 GetProjectionMatrix(float FOVdeg, float nearPlane, float farPlane);
 
 	// Lee las flechas del teclado y mueve la cámara
