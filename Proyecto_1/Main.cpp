@@ -15,12 +15,12 @@
 #include "Camera.h"
 
 
-// ------------------------------------------------------------
+
 // PIRÁMIDE
 // Cada vértice tiene:
 // posición X,Y,Z  +  color R,G,B  +  coordenada de textura U,V
 // Base cuadrada (4 vértices) + punta (1 vértice) = 5 vértices
-// ------------------------------------------------------------
+
 
 GLfloat vertices[] =
 { //     POSICIÓN            //      COLOR           //  TEXCOORD
@@ -48,9 +48,8 @@ GLuint indices[] =
 
 int main()
 {
-    // --------------------------------------------------------
+  
     // INICIALIZAR GLFW
-    // --------------------------------------------------------
 
     glfwInit();
 
@@ -62,9 +61,9 @@ int main()
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
 
-    // --------------------------------------------------------
+
     // CREAR VENTANA
-    // --------------------------------------------------------
+   
 
     GLFWwindow* window = glfwCreateWindow(
         800,
@@ -87,18 +86,17 @@ int main()
 
 
 
-    // --------------------------------------------------------
     // INICIALIZAR GLAD
-    // --------------------------------------------------------
+  
 
     gladLoadGL();
 
     glViewport(0, 0, 800, 800);
 
 
-    // --------------------------------------------------------
-    // DEPTH TEST
-    // --------------------------------------------------------
+    
+	// DEPTH TEST que es para que OpenGL sepa qué fragmentos dibujar y cuáles descartar según la profundidad (Z)
+
 
     glEnable(GL_DEPTH_TEST);
 
@@ -116,14 +114,14 @@ int main()
     // VAO / VBO / EBO
     // --------------------------------------------------------
 
-    VAO VAO1;
-    VAO1.Bind();
+	VAO VAO1; // Creamos un objeto VAO para la pirámide
+	VAO1.Bind(); // Vinculamos el VAO para que las siguientes llamadas afecten a este VAO
 
-    VBO VBO1(vertices, sizeof(vertices));
-    EBO EBO1(indices, sizeof(indices));
+	VBO VBO1(vertices, sizeof(vertices)); // Creamos un objeto VBO y le pasamos los vértices de la pirámide
+	EBO EBO1(indices, sizeof(indices));// Creamos un objeto EBO y le pasamos los índices de la pirámide
 
     // Posición -> location 0 (3 floats)
-    VAO1.LinkAttrib(
+	VAO1.LinkAttrib( // Vinculamos el VBO al VAO y le decimos a OpenGL cómo interpretar los datos de los vértices
         VBO1,
         0,
         3,
@@ -133,7 +131,7 @@ int main()
     );
 
     // Color -> location 1 (3 floats)
-    VAO1.LinkAttrib(
+	VAO1.LinkAttrib( // Vinculamos el VBO al VAO y le decimos a OpenGL cómo interpretar los datos de los vértices
         VBO1,
         1,
         3,
@@ -157,11 +155,11 @@ int main()
     EBO1.Unbind();
 
 
-    // --------------------------------------------------------
+    
     // TEXTURA
-    // --------------------------------------------------------
+   
 
-    Texture pyramidTex(
+	Texture pyramidTex( // Creamos un objeto de textura y le pasamos la ruta de la imagen
         "texture.png",
         GL_TEXTURE_2D,
         GL_TEXTURE0,
@@ -169,77 +167,75 @@ int main()
         GL_UNSIGNED_BYTE
     );
 
-    pyramidTex.texUnit(shaderProgram, "tex0", 0);
+	pyramidTex.texUnit(shaderProgram, "tex0", 0); // Le decimos al shader en qué "unidad de textura" (slot) buscar esta textura
 
-    // --------------------------------------------------------
+    
     // UNIFORM
-    // --------------------------------------------------------
-
-    GLuint uniMVP = glGetUniformLocation(
+  
+	// Obtenemos la ubicación de la variable uniforme "uMVP" en el shader
+    GLuint uniMVP = glGetUniformLocation( 
         shaderProgram.ID,
         "uMVP"
     );
 
 
-    // --------------------------------------------------------
+  
     // CÁMARA
-    // --------------------------------------------------------
+   
 
     Camera camera(800, 800, glm::vec3(0.0f, 1.0f, 3.0f));
 
     float lastFrame = 0.0f;
 
 
-    // --------------------------------------------------------
+   
     // Render loop
-    // --------------------------------------------------------
+
     while (!glfwWindowShouldClose(window))
     {
-        // ----------------------------------------------------
+       
         // DELTA TIME (para que la velocidad no dependa del FPS)
-        // ----------------------------------------------------
+     
 
         float currentFrame = (float)glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
 
-        // ----------------------------------------------------
+        
         // INPUT DE CÁMARA (flechas del teclado)
-        // ----------------------------------------------------
-
+        
         camera.Inputs(window, deltaTime);
 
 
-        // ----------------------------------------------------
+      
         // LIMPIAR PANTALLA
-        // ----------------------------------------------------
+      
 
-        glClearColor(0.2f, 0.6f, 0.3f, 1.0f);
+		glClearColor(0.2f, 0.6f, 0.3f, 1.0f);// Color de fondo (verde)
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpiar el buffer de color y el buffer de profundidad
 
 
         // Activar shader
         shaderProgram.Activate();
 
 
-        // ----------------------------------------------------
+       
         // MATRICES DE VISTA Y PROYECCIÓN (desde la cámara)
-        // ----------------------------------------------------
+        
 
-        glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 view = camera.GetViewMatrix(); // Arma la matriz de vista (dónde está la cámara y hacia dónde mira)
 
-        glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f);
+		glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f); // Arma la matriz de proyección (perspectiva, FOV, planos near/far) la que simula la perspectiva
 
 
-        // ----------------------------------------------------
         // MODELO DE LA PIRÁMIDE (quieta en el origen)
-        // ----------------------------------------------------
+   
 
-        glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f); // Matriz identidad (no hay transformación)
 
-        glm::mat4 mvp = projection * view * model;
+		glm::mat4 mvp = projection * view * model; // Matriz final que se pasa al shader (MVP = Model * View * Projection)
 
         glUniformMatrix4fv(
             uniMVP,
@@ -249,11 +245,10 @@ int main()
         );
 
 
-        // ----------------------------------------------------
         // DIBUJAR LA PIRÁMIDE
-        // ----------------------------------------------------
+     
 
-        pyramidTex.Bind();
+		pyramidTex.Bind(); // Activamos la textura para usarla al dibujar
 
         VAO1.Bind();
 
@@ -265,11 +260,9 @@ int main()
         );
 
 
-        // ----------------------------------------------------
         // TERMINAR FRAME
-        // ----------------------------------------------------
-
-        glfwSwapBuffers(window);
+        
+		glfwSwapBuffers(window); // Intercambiar el buffer de color (mostrar lo que se dibujó en este frame)
 
         glfwPollEvents();
     }
