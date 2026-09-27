@@ -84,6 +84,9 @@ int main()
 
     glfwMakeContextCurrent(window);
 
+   // Oculta el cursor y lo "atrapa" dentro de la ventana, para que se pueda
+  // mover infinitamente en cualquier dirección sin salirse (estilo FPS)
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
     // INICIALIZAR GLAD
@@ -103,16 +106,15 @@ int main()
     glDepthFunc(GL_LESS);
 
 
-    // --------------------------------------------------------
+
      // SHADER
-     // --------------------------------------------------------
+	//Inicializamos el shader con los archivos de vértices y fragmentos
 
     Shader shaderProgram("default.vert", "default.frag");
 
 
-    // --------------------------------------------------------
     // VAO / VBO / EBO
-    // --------------------------------------------------------
+  
 
 	VAO VAO1; // Creamos un objeto VAO para la pirámide
 	VAO1.Bind(); // Vinculamos el VAO para que las siguientes llamadas afecten a este VAO
@@ -189,53 +191,73 @@ int main()
 
 
    
+    // --------------------------------------------------------
     // Render loop
+    // --------------------------------------------------------
 
     while (!glfwWindowShouldClose(window))
     {
-       
+        // ----------------------------------------------------
         // DELTA TIME (para que la velocidad no dependa del FPS)
-     
+        // ----------------------------------------------------
 
         float currentFrame = (float)glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
 
-        
+        // ----------------------------------------------------
         // INPUT DE CÁMARA (flechas del teclado)
-        
+        // ----------------------------------------------------
+
         camera.Inputs(window, deltaTime);
+        camera.MouseInputs(window);
+
+        // ESC cierra el programa (útil porque el cursor queda oculto/atrapado)
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            glfwSetWindowShouldClose(window, true);
+        }
 
 
-      
+        // ----------------------------------------------------
         // LIMPIAR PANTALLA
-      
+        // ----------------------------------------------------
 
-		glClearColor(0.2f, 0.6f, 0.3f, 1.0f);// Color de fondo (verde)
+        glClearColor(0.2f, 0.6f, 0.3f, 1.0f);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpiar el buffer de color y el buffer de profundidad
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         // Activar shader
         shaderProgram.Activate();
 
 
-       
+        // ----------------------------------------------------
         // MATRICES DE VISTA Y PROYECCIÓN (desde la cámara)
-        
+        // ----------------------------------------------------
 
-		glm::mat4 view = camera.GetViewMatrix(); // Arma la matriz de vista (dónde está la cámara y hacia dónde mira)
+        glm::mat4 view = camera.GetViewMatrix();
 
-		glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f); // Arma la matriz de proyección (perspectiva, FOV, planos near/far) la que simula la perspectiva
+        glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f);
 
 
-        // MODELO DE LA PIRÁMIDE (quieta en el origen)
-   
+        // ----------------------------------------------------
+        // MODELO DE LA PIRÁMIDE (gira sola sobre el eje Y)
+        // ----------------------------------------------------
 
-		glm::mat4 model = glm::mat4(1.0f); // Matriz identidad (no hay transformación)
+        // Grados por segundo que gira la pirámide
+        float rotationSpeed = 50.0f;
 
-		glm::mat4 mvp = projection * view * model; // Matriz final que se pasa al shader (MVP = Model * View * Projection)
+        glm::mat4 model = glm::mat4(1.0f);
+
+        model = glm::rotate(
+            model,
+            glm::radians(rotationSpeed) * currentFrame,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+        glm::mat4 mvp = projection * view * model;
 
         glUniformMatrix4fv(
             uniMVP,
@@ -245,10 +267,11 @@ int main()
         );
 
 
+        // ----------------------------------------------------
         // DIBUJAR LA PIRÁMIDE
-     
+        // ----------------------------------------------------
 
-		pyramidTex.Bind(); // Activamos la textura para usarla al dibujar
+        pyramidTex.Bind();
 
         VAO1.Bind();
 
@@ -260,9 +283,11 @@ int main()
         );
 
 
+        // ----------------------------------------------------
         // TERMINAR FRAME
-        
-		glfwSwapBuffers(window); // Intercambiar el buffer de color (mostrar lo que se dibujó en este frame)
+        // ----------------------------------------------------
+
+        glfwSwapBuffers(window);
 
         glfwPollEvents();
     }
