@@ -8,9 +8,10 @@
 class Texture
 {
 public:
-	GLuint ID;
-	GLenum type;
-	Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
+	GLuint ID; // ID de la textura en OpenGL
+	GLenum type; // Tipo de textura (GL_TEXTURE_2D, GL_TEXTURE_CUBE_MAP, etc.)
+	Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType); 
+	// Constructor que carga la textura desde un archivo de imagen
 
 	// Le dice al shader en qué "unidad de textura" (slot) buscar esta textura
 	void texUnit(Shader& shader, const char* uniform, GLuint unit);

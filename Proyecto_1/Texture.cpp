@@ -4,9 +4,9 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 {
 	type = texType;
 
-	// --------------------------------------------------------
+
 	// Cargar la imagen desde disco con stb_image
-	// --------------------------------------------------------
+
 
 	int widthImg, heightImg, numColCh;
 
@@ -28,9 +28,8 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 		std::cout << "ERROR::TEXTURE No se pudo cargar la imagen: " << image << std::endl;
 	}
 
-	// --------------------------------------------------------
 	// Generar la textura en OpenGL
-	// --------------------------------------------------------
+	
 
 	glGenTextures(1, &ID);
 	glActiveTexture(slot);
@@ -53,7 +52,7 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	glBindTexture(texType, 0);
 }
 
-void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
+void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit) // Le dice al shader en qué "unidad de textura" (slot) buscar esta textura
 {
 	GLuint texUni = glGetUniformLocation(shader.ID, uniform);
 	shader.Activate();

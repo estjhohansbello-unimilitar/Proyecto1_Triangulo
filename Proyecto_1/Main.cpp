@@ -27,7 +27,7 @@ GLfloat vertices[] =
     -0.5f, 0.0f,  0.5f,       0.83f, 0.70f, 0.44f,     0.0f, 0.0f,
     -0.5f, 0.0f, -0.5f,       0.83f, 0.70f, 0.44f,     5.0f, 0.0f,
      0.5f, 0.0f, -0.5f,       0.83f, 0.70f, 0.44f,     0.0f, 0.0f,
-     0.5f, 0.0f,  0.5f,       0.83f, 0.70f, 0.44f,     5.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,       0.83f, 0.70f, 0.44f,     5.0f, 0.0f,// Punta de la pirámide
      0.0f, 0.8f,  0.0f,       0.92f, 0.86f, 0.76f,     2.5f, 5.0f
 };
 
@@ -143,13 +143,13 @@ int main()
     );
 
     // Coordenada de textura -> location 2 (2 floats)
-    VAO1.LinkAttrib(
-        VBO1,
+	VAO1.LinkAttrib( // Vinculamos el VBO al VAO y le decimos a OpenGL cómo interpretar los datos de los vértices
+		VBO1, // VBO de la pirámide
         2,
         2,
-        GL_FLOAT,
+		GL_FLOAT, // Cada vértice tiene 8 floats: 3 de posición, 3 de color y 2 de coordenadas de textura
         8 * sizeof(float),
-        (void*)(6 * sizeof(float))
+		(void*)(6 * sizeof(float)) // La coordenada de textura empieza después de los 6 primeros floats (3 de posición + 3 de color)
     );
 
     VAO1.Unbind();
@@ -185,7 +185,8 @@ int main()
     // CÁMARA
    
 
-	Camera camera(800, 800, glm::vec3(0.0f, 1.0f, 3.0f)); // Creamos una cámara con la posición inicial (0, 1, 3) y el tamaño de la ventana (800x800)
+	Camera camera(800, 800, glm::vec3(0.0f, 1.0f, 3.0f)); // Creamos una cámara con la posición inicial (0, 1, 37) 
+    //y el tamaño de la ventana (800x800)
 
 	float lastFrame = 0.0f; // Variable para almacenar el tiempo del último frame, para calcular el delta time (tiempo entre frames)
 
@@ -199,20 +200,20 @@ int main()
     {
     
 		// DELTA TIME (para que la velocidad no dependa del FPS), se usa para mover la cámara y para rotar la pirámide a velocidad constante
-        float currentFrame = (float)glfwGetTime();
-        float deltaTime = currentFrame - lastFrame; 
-        lastFrame = currentFrame;
+		float currentFrame = (float)glfwGetTime(); // Obtenemos el tiempo actual en segundos desde que se inició el programa
+		float deltaTime = currentFrame - lastFrame;  // Calculamos el tiempo transcurrido desde el último frame
+		lastFrame = currentFrame; // Actualizamos el tiempo del último frame para el próximo cálculo de delta time
 
 
         // INPUT DE CÁMARA (flechas del teclado)
         
-        camera.Inputs(window, deltaTime);
-        camera.MouseInputs(window);
+		camera.Inputs(window, deltaTime); // Lee las flechas/WASD del teclado y mueve la cámara
+		camera.MouseInputs(window); // Lee el movimiento del mouse y rota la cámara (yaw/pitch)
 
         // ESC cierra el programa (útil porque el cursor queda oculto/atrapado)
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) // Si se presiona la tecla ESC, cerramos la ventana
         {
-            glfwSetWindowShouldClose(window, true);
+			glfwSetWindowShouldClose(window, true); // Le decimos a GLFW que cierre la ventana y termine el programa
         }
 
 
@@ -241,24 +242,29 @@ int main()
         // MODELO DE LA PIRÁMIDE (gira sola sobre el eje Y)
      
 
-        // Grados por segundo que gira la pirámide
-        float rotationSpeed = 1000.0f; 
+        // Grados por segundo que gira la pirámide 
+        float rotationSpeed = 40.0f; //la velocidad a la que rota la piramide
 
+        // Matriz identidad: punto de partida neutral, sin ninguna
+        // transformación aplicada todavía.
         glm::mat4 model = glm::mat4(1.0f); 
-
-        model = glm::rotate(
+    // Rota la pirámide sobre el eje Y (como un trompo), usando el
+    // ángulo acumulado hasta este instante: (grados/segundo * segundos
+    // transcurridos). Al recalcularse desde cero cada frame con el
+    // tiempo total, el ángulo siempre es exacto, sin ir acumulando.
+        model = glm::rotate( 
             model,
-            glm::radians(rotationSpeed) * currentFrame,
-            glm::vec3(0.0f, 1.0f, 0.0f)
+            glm::radians(rotationSpeed) * currentFrame, // ángulo actual en radianes
+            glm::vec3(0.0f, 1.0f, 0.0f) // eje de rotación: Y (vertical)
         );
 
-        glm::mat4 mvp = projection * view * model;
+		glm::mat4 mvp = projection * view * model; // Matriz final que combina proyección, vista y modelo
 
-        glUniformMatrix4fv(
-            uniMVP,
+		glUniformMatrix4fv( // Le pasamos la matriz final al shader
+			uniMVP, // ubicación de la variable uniforme en el shader
             1,
-            GL_FALSE,
-            glm::value_ptr(mvp)
+			GL_FALSE, // no queremos que OpenGL transcriba la matriz (ya está en el orden correcto)
+			glm::value_ptr(mvp) // convertimos la matriz a un puntero de tipo float para pasarlo a OpenGL
         );
 
 
@@ -266,14 +272,14 @@ int main()
         // DIBUJAR LA PIRÁMIDE
 
 
-        pyramidTex.Bind();
+		pyramidTex.Bind(); // Activamos la textura para que se use al dibujar la pirámide
 
-        VAO1.Bind();
+		VAO1.Bind(); // Vinculamos el VAO de la pirámide para que OpenGL sepa qué vértices usar
 
-        glDrawElements(
-            GL_TRIANGLES,
-            sizeof(indices) / sizeof(int),
-            GL_UNSIGNED_INT,
+		glDrawElements( // Dibujamos la pirámide usando los índices del EBO
+			GL_TRIANGLES, // dibujamos triángulos
+			sizeof(indices) / sizeof(int), // cantidad de índices a dibujar
+			GL_UNSIGNED_INT, // tipo de los índices (unsigned int)
             0
         );
 
@@ -281,15 +287,15 @@ int main()
         // TERMINAR FRAME
        
 
-        glfwSwapBuffers(window);
+		glfwSwapBuffers(window); // Intercambia el buffer de color (lo que se dibujó) con el buffer de pantalla (lo que se ve)
 
 		glfwPollEvents(); // Procesa eventos de entrada (teclado, ratón, etc.)
     }
 
 
-    // --------------------------------------------------------
+    
     // LIBERAR RECURSOS
-    // --------------------------------------------------------
+  
 
     VAO1.Delete();
     VBO1.Delete();

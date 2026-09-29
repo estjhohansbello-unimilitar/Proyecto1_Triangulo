@@ -6,6 +6,8 @@
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 
+//Up es el vector que define la dirección "arriba" de la cámara, que es necesaria para calcular la matriz de vista correctamente.
+//Yaw significa "cabeceo" y pitch significa "inclinación". Son los ángulos que definen la orientación de la cámara en 3D.
 class Camera
 {
 public:
@@ -14,6 +16,7 @@ public:
 	glm::vec3 Position;
 
 	// Hacia dónde "mira" la cámara (vector de dirección)
+	// Inicialmente mirando hacia el eje -Z (hacia adelante) ya que en OpenGL el eje Z positivo sale de la pantalla 
 	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	// Vector "arriba" del mundo
@@ -25,7 +28,7 @@ public:
 	// Qué tan rápido se mueve la cámara por frame
 	float speed = 2.0f;
 
-	// --- Control de rotación con el mouse (estilo cámara FPS) ---
+	// Control de rotación con el mouse
 
 	// Ángulo horizontal (izquierda/derecha) y vertical (arriba/abajo) de la vista
 	float Yaw = -90.0f; // Inicialmente mirando hacia el eje -Z, yaw = -90° para que la cámara mire hacia adelante
