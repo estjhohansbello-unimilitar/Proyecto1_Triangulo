@@ -14,6 +14,9 @@
 #include "Texture.h"
 #include "Camera.h"
 
+//gltf 
+#include "ModelLoader.h"
+#include <iostream>
 
 
 // PIRÁMIDE
@@ -48,6 +51,21 @@ GLuint indices[] =
 
 int main()
 {
+    tinygltf::Model model;
+
+    if (!LoadGLTF("Models/rubber_duck.glb", model))
+    {
+        return -1;
+    }
+
+    std::cout << "Cantidad de meshes: "
+        << model.meshes.size() << std::endl;
+
+    std::cout << "Cantidad de materiales: "
+        << model.materials.size() << std::endl;
+
+    std::cout << "Cantidad de nodos: "
+        << model.nodes.size() << std::endl;
   
     // INICIALIZAR GLFW
 
