@@ -243,11 +243,13 @@ int main()
      
 
         // Grados por segundo que gira la pirámide 
-        float rotationSpeed = 40.0f; //la velocidad a la que rota la piramide
+        float rotationSpeed = 120.0f; //la velocidad a la que rota la piramide
 
         // Matriz identidad: punto de partida neutral, sin ninguna
         // transformación aplicada todavía.
         glm::mat4 model = glm::mat4(1.0f); 
+
+
     // Rota la pirámide sobre el eje Y (como un trompo), usando el
     // ángulo acumulado hasta este instante: (grados/segundo * segundos
     // transcurridos). Al recalcularse desde cero cada frame con el
