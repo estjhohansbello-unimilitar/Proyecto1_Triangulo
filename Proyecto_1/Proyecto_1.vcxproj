@@ -167,6 +167,8 @@
   <ItemGroup>
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="model.frag" />
+    <None Include="model.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

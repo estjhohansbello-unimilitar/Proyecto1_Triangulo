@@ -56,6 +56,12 @@
     <None Include="default.frag">
       <Filter>Archivos de recursos\Shaders</Filter>
     </None>
+    <None Include="model.vert">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
+    <None Include="model.frag">
+      <Filter>Archivos de recursos\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
