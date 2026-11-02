@@ -22,10 +22,14 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	// que lea en glTexImage2D (GL_RGBA = 4 canales). Esa discordancia hace
 	// que el driver lea memoria fuera del buffer -> crash de acceso inválido.
 	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 4);
-
+	
 	if (bytes == nullptr)
 	{
-		std::cout << "ERROR::TEXTURE No se pudo cargar la imagen: " << image << std::endl;
+		std::cout << "ERROR::TEXTURE No se pudo cargar la imagen: "
+			<< image << std::endl;
+
+		ID = 0;
+		return;
 	}
 
 	// Generar la textura en OpenGL
