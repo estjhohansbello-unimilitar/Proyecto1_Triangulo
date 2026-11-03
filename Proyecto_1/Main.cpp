@@ -131,7 +131,7 @@ int main()
 	//Inicializamos el shader con los archivos de vértices y fragmentos
 
     Shader shaderProgram("default.vert", "default.frag"); 
-    Shader shaderProgram("model.vert", "model.frag");
+    Shader modelShader("model.vert", "model.frag");
 
     // VAO / VBO / EBO
   
@@ -319,7 +319,25 @@ int main()
             0
         );
 
+        // DIBUJAR EL PATO
 
+        modelShader.Activate();
+
+        // Calculamos la matriz MVP del pato
+        glm::mat4 duckMVP = projection * view * duckModel;
+
+        // Enviamos la matriz al shader
+        GLint duckMVPUniform = glGetUniformLocation(modelShader.ID, "uMVP");
+
+        glUniformMatrix4fv(
+            duckMVPUniform,
+            1,
+            GL_FALSE,
+            glm::value_ptr(duckMVP)
+        );
+
+        // Dibujamos todas las mallas del modelo
+        duck.Draw();
         // TERMINAR FRAME
        
 

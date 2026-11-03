@@ -276,7 +276,81 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
                 << indices.size()
                 << std::endl;
         }
+       
     }
+    // INFORMACIÓN DEL MODELO
+    std::cout << "\n========== INFORMACION DEL MODELO ==========" << std::endl;
+
+    std::cout << "Cantidad de meshes: "
+        << gltfModel.meshes.size() << std::endl;
+
+    std::cout << "Cantidad de nodos: "
+        << gltfModel.nodes.size() << std::endl;
+
+    std::cout << "Cantidad de escenas: "
+        << gltfModel.scenes.size() << std::endl;
+
+    std::cout << "Cantidad de mallas OpenGL creadas: "
+        << meshes.size() << std::endl;
+
+    std::cout << "============================================" << std::endl;
+
+    // INFORMACION DE LOS NODOS
+
+    std::cout << "\n========== INFORMACION DE NODOS ==========" << std::endl;
+
+    for (size_t i = 0; i < gltfModel.nodes.size(); i++)
+    {
+        const auto& node = gltfModel.nodes[i];
+
+        std::cout << "\nNodo: " << i << std::endl;
+        std::cout << "Nombre: " << node.name << std::endl;
+        std::cout << "Mesh asociado: " << node.mesh << std::endl;
+
+        std::cout << "Hijos: ";
+
+        for (int child : node.children)
+        {
+            std::cout << child << " ";
+        }
+
+        std::cout << std::endl;
+
+        // TRANSFORMACIONES DEL NODO
+
+        std::cout << "Translation: ";
+
+        for (double value : node.translation)
+        {
+            std::cout << value << " ";
+        }
+
+        std::cout << "\nScale: ";
+
+        for (double value : node.scale)
+        {
+            std::cout << value << " ";
+        }
+
+        std::cout << "\nRotation: ";
+
+        for (double value : node.rotation)
+        {
+            std::cout << value << " ";
+        }
+
+        std::cout << "\nMatrix: ";
+
+        for (double value : node.matrix)
+        {
+            std::cout << value << " ";
+        }
+
+        std::cout << "\n";
+    }
+
+    std::cout << "==========================================" << std::endl;
+        
 }
 
 // Dibujar todas las mallas
