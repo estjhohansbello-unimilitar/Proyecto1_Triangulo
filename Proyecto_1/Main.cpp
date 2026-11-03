@@ -257,7 +257,21 @@ int main()
 
         glm::mat4 projection = camera.GetProjectionMatrix(45.0f, 0.1f, 100.0f);
 
+        // MATRIZ DE MODELO DEL PATO
 
+        glm::mat4 duckModel = glm::mat4(1.0f);
+
+        // Reducimos el tamaño del pato
+        duckModel = glm::scale(
+            duckModel,
+            glm::vec3(0.5f, 0.5f, 0.5f)
+        );
+
+        // Movemos el pato hacia la derecha
+        duckModel = glm::translate(
+            duckModel,
+            glm::vec3(2.0f, 0.0f, 0.0f)
+        );
        
         // MODELO DE LA PIRÁMIDE (gira sola sobre el eje Y)
      
