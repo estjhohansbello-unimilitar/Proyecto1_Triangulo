@@ -14,6 +14,7 @@
 #include "Texture.h"
 #include "Camera.h"
 
+#include "Model.h"
 //gltf 
 #include "ModelLoader.h"
 #include <iostream>
@@ -123,13 +124,14 @@ int main()
 
 	glDepthFunc(GL_LESS); // Decimos que un fragmento se dibuja si su profundidad es menor que la del fragmento que ya está en el framebuffer (el que ya se dibujó antes)
 
-
+    // CREAR MODELO 3D
+    Model duck(model);
 
      // SHADER
 	//Inicializamos el shader con los archivos de vértices y fragmentos
 
-    Shader shaderProgram("default.vert", "default.frag");
-
+    Shader shaderProgram("default.vert", "default.frag"); 
+    Shader shaderProgram("model.vert", "model.frag");
 
     // VAO / VBO / EBO
   
