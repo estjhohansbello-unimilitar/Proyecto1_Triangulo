@@ -1,15 +1,19 @@
-
 #include "Model.h"
 
 #include <iostream>
 #include <cstring>
 #include <cstddef>
 
-// Obtener la dirección de los datos de un accessor
+// Obtener la dirección de los datos de un accessor.
+// Devuelve nullptr si el accessor no tiene bufferView
+// (accessors sparse o modelos comprimidos).
 static const unsigned char* GetAccessorData(
     const tinygltf::Model& model,
     const tinygltf::Accessor& accessor)
 {
+    if (accessor.bufferView < 0)
+        return nullptr;
+
     const tinygltf::BufferView& view =
         model.bufferViews[accessor.bufferView];
 
@@ -21,7 +25,7 @@ static const unsigned char* GetAccessorData(
         + accessor.byteOffset;
 }
 
-// Obtener el tamaño de cada elemento
+// Obtener la separación en bytes entre elementos consecutivos
 static size_t GetStride(
     const tinygltf::Model& model,
     const tinygltf::Accessor& accessor)
@@ -119,6 +123,13 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
             const unsigned char* positionData =
                 GetAccessorData(gltfModel, positionAccessor);
 
+            if (positionData == nullptr)
+            {
+                std::cout << "POSITION sin bufferView (sparse o comprimido)"
+                    << std::endl;
+                continue;
+            }
+
             size_t positionStride =
                 GetStride(gltfModel, positionAccessor);
 
@@ -126,11 +137,14 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
 
             std::vector<Vertex> vertices(vertexCount);
 
-            // Extraer posiciones
+            // Extraer posiciones y actualizar la caja envolvente
             for (size_t i = 0; i < vertexCount; i++)
             {
                 vertices[i].position =
                     ReadVec3(positionData, positionStride, i);
+
+                boundsMin = glm::min(boundsMin, vertices[i].position);
+                boundsMax = glm::max(boundsMax, vertices[i].position);
 
                 vertices[i].normal = glm::vec3(0.0f);
                 vertices[i].texCoords = glm::vec2(0.0f);
@@ -145,14 +159,15 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
                 const tinygltf::Accessor& normalAccessor =
                     gltfModel.accessors[normalIt->second];
 
-                if (normalAccessor.count == vertexCount &&
+                const unsigned char* normalData =
+                    GetAccessorData(gltfModel, normalAccessor);
+
+                if (normalData != nullptr &&
+                    normalAccessor.count == vertexCount &&
                     normalAccessor.componentType ==
                     TINYGLTF_COMPONENT_TYPE_FLOAT &&
                     normalAccessor.type == TINYGLTF_TYPE_VEC3)
                 {
-                    const unsigned char* normalData =
-                        GetAccessorData(gltfModel, normalAccessor);
-
                     size_t normalStride =
                         GetStride(gltfModel, normalAccessor);
 
@@ -173,14 +188,15 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
                 const tinygltf::Accessor& uvAccessor =
                     gltfModel.accessors[uvIt->second];
 
-                if (uvAccessor.count == vertexCount &&
+                const unsigned char* uvData =
+                    GetAccessorData(gltfModel, uvAccessor);
+
+                if (uvData != nullptr &&
+                    uvAccessor.count == vertexCount &&
                     uvAccessor.componentType ==
                     TINYGLTF_COMPONENT_TYPE_FLOAT &&
                     uvAccessor.type == TINYGLTF_TYPE_VEC2)
                 {
-                    const unsigned char* uvData =
-                        GetAccessorData(gltfModel, uvAccessor);
-
                     size_t uvStride =
                         GetStride(gltfModel, uvAccessor);
 
@@ -202,6 +218,13 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
 
                 const unsigned char* indexData =
                     GetAccessorData(gltfModel, indexAccessor);
+
+                if (indexData == nullptr)
+                {
+                    std::cout << "Indices sin bufferView (sparse o comprimido)"
+                        << std::endl;
+                    continue;
+                }
 
                 size_t indexStride =
                     GetStride(gltfModel, indexAccessor);
@@ -260,7 +283,6 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
                     indices.push_back(i);
                 }
             }
-           
 
             if (indices.empty())
                 continue;
@@ -276,9 +298,9 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
                 << indices.size()
                 << std::endl;
         }
-       
     }
-    // INFORMACIÓN DEL MODELO
+
+    // INFORMACION DEL MODELO
     std::cout << "\n========== INFORMACION DEL MODELO ==========" << std::endl;
 
     std::cout << "Cantidad de meshes: "
@@ -293,10 +315,15 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
     std::cout << "Cantidad de mallas OpenGL creadas: "
         << meshes.size() << std::endl;
 
+    std::cout << "Bounds min: "
+        << boundsMin.x << " " << boundsMin.y << " " << boundsMin.z
+        << "\nBounds max: "
+        << boundsMax.x << " " << boundsMax.y << " " << boundsMax.z
+        << std::endl;
+
     std::cout << "============================================" << std::endl;
 
     // INFORMACION DE LOS NODOS
-
     std::cout << "\n========== INFORMACION DE NODOS ==========" << std::endl;
 
     for (size_t i = 0; i < gltfModel.nodes.size(); i++)
@@ -317,6 +344,7 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
         std::cout << std::endl;
 
         // TRANSFORMACIONES DEL NODO
+        // (un arreglo vacío significa "sin transformación")
 
         std::cout << "Translation: ";
 
@@ -350,7 +378,6 @@ void Model::LoadMesh(const tinygltf::Model& gltfModel)
     }
 
     std::cout << "==========================================" << std::endl;
-        
 }
 
 // Dibujar todas las mallas
