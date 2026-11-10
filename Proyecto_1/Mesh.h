@@ -17,7 +17,7 @@ struct Vertex
 {
     glm::vec3 position;
     glm::vec3 normal;
-    glm::vec2 texCoords;
+	glm::vec2 texCoords;// coordenadas UV
 };
 
 class Mesh
@@ -29,8 +29,10 @@ public:
     std::unique_ptr<VBO> vbo;
     std::unique_ptr<EBO> ebo;
 
-    std::vector<Vertex> vertices;
+	std::vector<Vertex> vertices; // vector de vértices
     std::vector<GLuint> indices;
+    
+    int materialIndex = -1;
 
     Mesh(
         const std::vector<Vertex>& vertices,
